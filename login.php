@@ -19,9 +19,31 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         $errors[]='El password es obligario';
     }
 
-    // if(empty($errors)){
+    if(empty($errors)){
+        //Revisar si el usuario existe
 
-    // }
+        $query="SELECT * FROM  usuarios WHERE email='${email}'";
+        $resultado=mysqli_query($db, $query);
+        if($resultado->num_rows){
+            //revisar si el password es correcto
+            $usuario=mysqli_fetch_assoc($resultado);
+            //verificar si el password es correcto o no
+            $auth=password_verify($password,$usuario['password']);
+            if($auth){
+            //el usuario esta autenticado
+            session_start();
+
+            //lLENAR EL ARREGLO DE LA SESION
+            $_SESSION['usuario']=$usuario['email'];
+            $_SESSION['login']=true;
+            header('Location:/admin');
+            }else{
+                $errors[]='El password es incorrecto';
+            }
+        }else{
+            $errors[]='El usuario no existe';
+        }
+    }
 
 }
 
