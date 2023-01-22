@@ -1,6 +1,6 @@
 <?php
 // importatr la conexion
-require ('includes/config/database.php');
+require 'includes/app.php';
 $db=conetarDB();
 //autenticar usuario
 
@@ -49,7 +49,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
 
 //Incluir el header
 
-require 'includes/funciones.php';
+
 incluirTemplate('header');
 
 ?>
