@@ -1,6 +1,6 @@
 <?php
 // importatr la conexion
-require ('includes/config/database.php');
+require 'includes/app.php';
 $db=conetarDB();
 
 //email & password
