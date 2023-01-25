@@ -11,12 +11,11 @@ $db = conetarDB();
 
 //Concultar par abtener vendedores
 
-$consulta="SELECT * FROM vendedores";
-$resultado=mysqli_query($db,$consulta);
-
+$consulta = 'SELECT * FROM vendedores';
+$resultado = mysqli_query( $db, $consulta );
 
 // arreglo con mensajes de errores
-$errores = [];
+$errores = Propiedad::getErrores();
 
 //iniciando variables
 $titulo = '';
@@ -26,97 +25,41 @@ $habitaciones = '';
 $wc = '';
 $estacionamiento = '';
 $vendedorId = '';
-// $imagen='';
+// $imagen = '';
 
 //ejecutar el codigo despues de que el usuario envia el formulario
 if ( $_SERVER[ 'REQUEST_METHOD' ] === 'POST' ) {
-    // echo '<pre>';
-    // echo var_dump( $_POST );
-    // echo '</pre>';
-    // echo '<pre>';
-    // echo var_dump( $_FILES );
-    // echo '</pre>';
 
-    $titulo = mysqli_real_escape_string($db, $_POST[ 'titulo' ]);
-    $precio = mysqli_real_escape_string($db, $_POST[ 'precio' ]);
-    $descripcion = mysqli_real_escape_string($db, $_POST[ 'descripcion' ]);
-    $habitaciones = mysqli_real_escape_string($db, $_POST[ 'habitaciones' ]);
-    $wc = mysqli_real_escape_string($db, $_POST[ 'wc' ]);
-    $estacionamiento = mysqli_real_escape_string($db, $_POST[ 'estacionamiento' ]);
-    $vendedorId = mysqli_real_escape_string($db, $_POST[ 'vendedor' ]);
-    $creado = date('Y/m/d');
+    $propiedad = new Propiedad( $_POST );
+    $errores = $propiedad->validar();
 
-    //Asignar files hacia una variable
-    $imagen=$_FILES['imagen'];
-
-
-    //Validaciones
-    if ( !$titulo ) {
-        $errores[] = 'Debes añadir un titulo';
-    }
-    if ( !$precio ) {
-        $errores[] = 'El precio es obligatorio';
-    }
-    if ( strlen( $descripcion )<50 ) {
-        $errores[] = 'La descripción es obligatoria y debe tener al menos 50 caracteres';
-    }
-    if ( !$habitaciones ) {
-        $errores[] = 'El número de habitación es obligatorio';
-    }
-    if ( !$wc ) {
-        $errores[] = 'El número de baños es obligatorio';
-    }
-    if ( !$estacionamiento ) {
-        $errores[] = 'El número de lugares de estacionamiento es obligatorio';
-    }
-    if ( !$vendedorId ) {
-        $errores[] = 'Elige un vendedor';
-    }
-    if ( !$imagen['name'] || $imagen['error'] ) {
-        $errores[] = 'La imagen es obligatoria';
-    }
-
-
-    //vqalidar tamaño  (1mb maximo)
-    $medida=1000*1000;
-    if($imagen['size'] > $medida){
-        $errores[] = 'La imagen es muy pesada';
-    }
-
-
-
-    // echo '<pre>';
-    // var_dump ( $errores );
-    // echo '</pre>';
-    // exit;
-
-    //revisar que el arreglo de errores este vacio
     if ( empty( $errores ) ) {
+        $propiedad->guardar();
+
+        //Asignar files hacia una variable
+        $imagen = $_FILES[ 'imagen' ];
+
+        //revisar que el arreglo de errores este vacio
 
         /**Subida de archivos */
 
         /*Crear carpeta*/
 
-        $capetaImagenes="../../imagenes/";
-        if(!is_dir($capetaImagenes)){
-            mkdir($capetaImagenes);
+        $capetaImagenes = '../../imagenes/';
+        if ( !is_dir( $capetaImagenes ) ) {
+            mkdir( $capetaImagenes );
         }
 
-
         //generar nombre unico
-        $nombreImagen=md5(uniqid(rand(),true)).".jpg";
+        $nombreImagen = md5( uniqid( rand(), true ) ).'.jpg';
         //Subir imagen
-        move_uploaded_file($imagen['tmp_name'],$capetaImagenes.$nombreImagen);
-         
-        //Isertar en la bd
-        $query = "INSERT INTO propiedades (titulo,precio, imagen, descripcion,habitaciones,wc,estacionamiento,creado,vendedorId ) 
-        VALUES ('$titulo','$precio','$nombreImagen','$descripcion','$habitaciones','$wc','$estacionamiento','$creado','$vendedorId') ";
+        move_uploaded_file( $imagen[ 'tmp_name' ], $capetaImagenes.$nombreImagen );
 
         // echo $query;
         $resultado = mysqli_query( $db, $query );
         if ( $resultado ) {
             //redireccionar al usuario
-            header('Location:/admin?resultado=1');
+            header( 'Location:/admin?resultado=1' );
         }
     }
 
@@ -128,17 +71,18 @@ incluirTemplate( 'header' );
 <main class='contenedor seccion'>
     <h1>Crear</h1>
 
-
     <a href='/admin' class='boton boton-verde'>Volver</a>
 
-    <?php foreach($errores as $error):?>
-    <div class="alerta error">
-        <?php echo $error; ?>
+    <?php foreach ( $errores as $error ):?>
+    <div class='alerta error'>
+        <?php echo $error;
+?>
     </div>
-    <?php endforeach; ?>
+    <?php endforeach;
+?>
 
     <form action='' class='formulario' method='POST' action='/admin/propiedades/crear.php'
-        enctype="multipart/form-data">
+        enctype='multipart/form-data'>
         <fieldset>
             <legend>Información General</legend>
             <label for='titulo'>Titulo:</label>
@@ -147,9 +91,10 @@ incluirTemplate( 'header' );
             <input type='number' id='precio' name='precio' placeholder='Precio propiedad'
                 value="<?php echo $precio; ?>">
             <label for='imagen'>Imagen:</label>
-            <input type='file' id='imagen' name="imagen" accept='image/jpge,image/png'>
+            <input type='file' id='imagen' name='imagen' accept='image/jpge,image/png'>
             <label for='descripcion'>Descripción:</label>
-            <textarea name='descripcion' id='descripcion' cols='30' rows='10'> <?php echo $descripcion; ?></textarea>
+            <textarea name='descripcion' id='descripcion' cols='30' rows='10'> <?php echo $descripcion;
+?></textarea>
         </fieldset>
 
         <fieldset>
@@ -166,12 +111,15 @@ incluirTemplate( 'header' );
 
         <fieldset>
             <legend>Vendedor</legend>
-            <select name='vendedor' id=''>
+            <select name='vendedorId' id=''>
                 <option value=''>-- Seleccione --</option>
-                <?php while($row = mysqli_fetch_assoc($resultado)): ?>
-                <option <?php echo $vendedorId === $row['id'] ? 'selected':''; ?> value='<?php echo $row['id'];  ?>'>
-                    <?php echo $row['nombre'] . " " . $row['apellido'];?></option>
-                <?php endwhile; ?>
+                <?php while( $row = mysqli_fetch_assoc( $resultado ) ): ?>
+                <option <?php echo $vendedorId === $row[ 'id' ] ? 'selected':'';
+?> value='<?php echo $row['id'];  ?>'>
+                    <?php echo $row[ 'nombre' ] . ' ' . $row[ 'apellido' ];
+?></option>
+                <?php endwhile;
+?>
             </select>
         </fieldset>
         <br>
