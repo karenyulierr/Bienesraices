@@ -32,3 +32,36 @@ function s( $html ) :string {
     $s = htmlspecialchars( $html );
     return $s;
 }
+
+//validar tipo de contenido
+
+function validarTipoContenido( $tipo ) {
+
+    $tipos = [ 'vendedor', 'propiedad' ];
+
+    return in_array( $tipo, $tipos );
+}
+
+//Muestrar losm mensajes
+
+function mostrarNotificacion( $codigo ) {
+    $mensaje = '';
+
+    switch( $codigo ) {
+        case 1:
+            $mensaje = 'Creado correctamente';
+        break;
+        case 2:
+            $mensaje = 'Actualizado correctamente';
+        break;
+        case 3:
+            $mensaje = 'Eliminado correctamente';
+        break;
+
+        default:
+            $mensaje=false;
+        break;
+    }
+
+    return $mensaje;
+}

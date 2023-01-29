@@ -1,6 +1,7 @@
 <?php
 
 use App\Propiedad;
+use App\Vendedor;
 use Intervention\Image\ImageManagerStatic as Image;
 require '../../includes/app.php';
 
@@ -17,10 +18,10 @@ if ( !$id ) {
 //datos propiedad
 
 $propiedad = Propiedad::find( $id );
-//Concultar par abtener vendedores
-$consulta = 'SELECT * FROM vendedores';
-$resultado = mysqli_query( $db, $consulta );
 
+//Consulta para obtener todos los vendedores
+$vendedores = Vendedor::all();
+// debuguear( $vendedores );
 // arreglo con mensajes de errores
 $errores = Propiedad::getErrores();
 //ejecutar el codigo despues de que el usuario envia el formulario
@@ -47,8 +48,9 @@ if ( $_SERVER[ 'REQUEST_METHOD' ] === 'POST' ) {
     if ( empty( $errores ) ) {
 
         //Almacenar la imagen
-
-        $image->save(CARPETA_IMAGENES.$nombreImagen);
+        if ( $_FILES[ 'propiedad' ][ 'tmp_name' ][ 'imagen' ] ) {
+            $image->save( CARPETA_IMAGENES.$nombreImagen );
+        }
         $propiedad->guardar();
         //Isertar en la bd
     }
