@@ -6,7 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 //Conectarnos a la bd
 $db = conetarDB();
-use App\Propiedad;
+use App\ActiveRecord;
 
-Propiedad::setDB( $db );
+ActiveRecord::setDB( $db );
 

@@ -2,21 +2,15 @@
 require '../../includes/app.php';
 
 use App\Propiedad;
+use App\Vendedor;
 use Intervention\Image\ImageManagerStatic as Image;
 
 estaAutenticado();
-
-//base de datos
-
-$db = conetarDB();
-
 $propiedad = new Propiedad();
 
-//Concultar par abtener vendedores
-
-$consulta = 'SELECT * FROM vendedores';
-$resultado = mysqli_query( $db, $consulta );
-
+//Consulta para obtener todos los vendedores
+$vendedores= Vendedor::all();
+// debuguear($vendedores);
 // arreglo con mensajes de errores
 $errores = Propiedad::getErrores();
 
@@ -73,7 +67,7 @@ incluirTemplate( 'header' );
     <?php endforeach;
 ?>
 
-    <form action='' class='formulario' method='POST' action='/admin/propiedades/crear.php'
+    <form class='formulario' method='POST' action='/admin/propiedades/crear.php'
         enctype='multipart/form-data'>
         <?php
             include( '../../includes/templates/formulario_propiedades.php' );
